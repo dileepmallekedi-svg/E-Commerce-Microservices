@@ -1,0 +1,36 @@
+pipeline {
+  agent any
+
+  stages {
+    stage('Checkout') {
+      steps {
+        git 'https://github.com/YOUR-REPO.git'
+      }
+    }
+
+    stage('Build') {
+      steps {
+        sh 'mvn clean package'
+      }
+    }
+
+    stage('Docker Build') {
+      steps {
+        sh 'docker build -t ecommerce-app .'
+      }
+    }
+
+    stage('Push to ECR') {
+      steps {
+        sh 'docker tag ecommerce-app <ECR-URL>'
+        sh 'docker push <ECR-URL>'
+      }
+    }
+
+    stage('Deploy to Kubernetes') {
+      steps {
+        sh 'kubectl apply -f kubernetes/'
+      }
+    }
+  }
+}
